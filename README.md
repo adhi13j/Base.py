@@ -4,6 +4,7 @@ to do :-
 1) create a way to save data in tabular form
 2) create a way to visualize the data filtered on (date/time , column only , row only) in cmd
 3) basic CRUD functions with filters on (date/time)
+4) create files create.py, read/view.py, update.py, delete.py and main.py containing respective functions. Import functions from files to main.py.
 
 
 idea :
