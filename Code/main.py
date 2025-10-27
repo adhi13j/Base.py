@@ -41,29 +41,94 @@ def ADD () :
         
     row_df = pd.DataFrame([row_data])
     row_df.to_csv(f'{Current_table}.csv', mode='a', index=False, header=False)
+
     return
 def DEL () :
     print("Executing command : DEL")
+
+    global Current_table
+    df = pd.read_csv(f"{Current_table}.csv")
+
+    try :
+        index_to_delete = int(input("Index to delete : "))
+    except ValueError:
+        print("Invalid index.")
+        return
+    
+    if index_to_delete < 0 or index_to_delete >= len(df):
+        print("Index out of range.")
+        return
+
+    df = df.drop(index_to_delete).reset_index(drop=True)
+    df.to_csv(f"{Current_table}.csv", index=False)
+
+    return
+def ADDCOl() :
+    print("Executing command : ADDCOL ")
+
+    global Current_table
+    df = pd.read_csv(f"{Current_table}.csv")
+
+    col_name = input("Enter new column name: ").strip()
+    default_val = input("Default value: ")
+
+    df[col_name] = default_val
+    df.to_csv(f"{Current_table}.csv", index=False)
+
     return
 
-def ADDCOl() :
-    print("Executing command : ADDCOL")
-    dataType = input("dataType of new column :").lower()
-    
-    return
 def DELCOl() :
-    print("Executing command : DELCOL ")
+    print("Executing command : DELCOL")
+
+    global Current_table
+    df = pd.read_csv(f"{Current_table}.csv")
+
+    global Current_table
+    if not Current_table:
+        print("Error: No table opened.")
+        return
+
+    df = pd.read_csv(f"{Current_table}.csv")
+    print("Available columns:", ", ".join(df.columns))
+    col = input("Enter column name to delete: ").strip()
+
+    if col not in df.columns:
+        print("Column not found.")
+        return
+
+    df = df.drop(columns=[col])
+    df.to_csv(f"{Current_table}.csv", index=False)
+
     return
 
 def NEWTABLE() :
     print("Executing command : NEWTABLE")
-    return
+    name = input("Enter new table name: ").strip()
+
+    cols = input("Enter column names (comma separated): ").split(",")
+    cols = [c.strip() for c in cols if c.strip()]
+
+    if not cols:
+        print("No columns present , Table not created.")
+        return
+
+    df = pd.DataFrame(columns=cols)
+    df.to_csv(f"{name}.csv", index=False)
+    print(f"Table '{name}.csv' created successfully.")
+
 def OPENTABLE() :
+
     print("Executing command : OPENTABLE")
-    name = input("Table name")
+    name = input("Table name").strip()
+    
+    if not os.path.exists(f"{name}.csv"):
+       print("Error: Table not found.")
+       return
+    
     global Current_table
     Current_table = pd.read_csv(f"{name}.csv")
     return
+
 def DELTABLE() :
     print("Executing command : DELTABLE")
     
