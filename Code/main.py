@@ -3,6 +3,9 @@ import time
 import csv
 import os
 
+Current_table=None
+Running=True
+
 Commands = [
     "ADD" , 
     "DEL" ,
@@ -14,6 +17,8 @@ Commands = [
     "DELTABLE" ,
 ]
 # usefull to get String input and numeric input
+
+
 def check_input_type(user_input):
     try:
         # Attempt to convert to an integer
@@ -29,7 +34,13 @@ def check_input_type(user_input):
 
 def ADD () :
     print("Executing command : ADD")
+    
     global Current_table
+    
+    if not Current_table:
+        print("Error: No table opened.")
+        return
+
     
     columns = list(pd.read_csv(f'{Current_table}.csv').columns)
     
@@ -45,8 +56,13 @@ def ADD () :
     return
 def DEL () :
     print("Executing command : DEL")
-
+    
     global Current_table
+    
+    if not Current_table:
+        print("Error: No table opened.")
+        return
+
     df = pd.read_csv(f"{Current_table}.csv")
 
     try :
@@ -83,7 +99,6 @@ def DELCOl() :
     global Current_table
     df = pd.read_csv(f"{Current_table}.csv")
 
-    global Current_table
     if not Current_table:
         print("Error: No table opened.")
         return
@@ -119,14 +134,14 @@ def NEWTABLE() :
 def OPENTABLE() :
 
     print("Executing command : OPENTABLE")
-    name = input("Table name").strip()
+    name = input("Table name: ").strip()
     
     if not os.path.exists(f"{name}.csv"):
        print("Error: Table not found.")
        return
     
     global Current_table
-    Current_table = pd.read_csv(f"{name}.csv")
+    Current_table = name
     return
 
 def DELTABLE() :
@@ -140,7 +155,7 @@ def DELTABLE() :
         print("use DELTABLE command again")
         return
     
-    file_to_delete = f"{name}.txt"
+    file_to_delete = f"{name}.csv"
 
     try:
         os.remove(file_to_delete)
