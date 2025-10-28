@@ -12,7 +12,7 @@ def NEWTABLE() :
         return
 
     df = pd.DataFrame(columns=cols)
-    df.to_csv(f"{name}.csv", index=False)
+    df.to_csv(f"{name}.csv", index=True)
     print(f"Table '{name}.csv' created successfully.")
     
     return

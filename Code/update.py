@@ -18,7 +18,7 @@ def ADD (Current_table) :
         row_data[f"{column}"] = data_input
         
     row_df = pd.DataFrame([row_data])
-    row_df.to_csv(f'{Current_table}.csv', mode='a', index=False, header=False)
+    row_df.to_csv(f'{Current_table}.csv', mode='a', index=True, header=False)
 
     return Current_table
 
@@ -32,6 +32,44 @@ def ADDCOL(Current_table) :
     default_val = input("Default value: ")
 
     df[col_name] = default_val
-    df.to_csv(f"{Current_table}.csv", index=False)
+    df.to_csv(f"{Current_table}.csv", index=True)
+
+    return Current_table
+
+def UPDATE(Current_table):
+    
+    print("Executing command : UPDATE ")
+
+    df = pd.read_csv(f"{Current_table}.csv")
+
+    row_to_update = int(input("Index of row :").strip())
+
+    df.loc[row_to_update] = [input(f"Value of {column}") for column in df.columns]
+
+def UPDATECOL(Current_table):
+    
+    print("Executing command : UPDATECOL ")
+
+    df = pd.read_csv(f"{Current_table}.csv")
+
+    col_to_update = input("Name of Column").strip()
+
+    condition = int(input("new default value (1) of new list of values").strip())
+
+    if (condition):
+        #true
+        default_val = input("Default value: ")
+
+        df[col_to_update] = default_val
+        df.to_csv(f"{Current_table}.csv", index=True)
+
+    else :
+        values = []
+        for index in df.index :
+            value = input(f"value for row index {index} :")
+            values.append(value)
+
+        df[col_to_update] = values
+        df.to_csv(f"{Current_table}.csv", index=True)
 
     return Current_table
