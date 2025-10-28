@@ -3,21 +3,30 @@ import time
 import csv
 import os
 
+#Python files containing CRUD operations. Check Commands dict for classification details.
+import create
+import read
+import update
+import delete
+
 Current_table=None
 Running=True
 
-Commands = [
-    "ADD" , 
-    "DEL" ,
-    "ADDCOl" ,
-    "DELCOl" ,
 
-    "NEWTABLE" ,
-    "OPENTABLE" ,
-    "DELTABLE" ,
-]
+#Here structure is [command : File.command, if it needs Current table as parameter] - will be used in main to pass Current table to relevant functions.
+Commands = {
+    "ADD" : (update.ADD,True) , 
+    "DEL" : (delete.DEL,True),
+    "ADDCOL" : (update.ADDCOL,True) ,
+    "DELCOL" : (delete.DELCOL,True) ,
+
+    "NEWTABLE": (create.NEWTABLE,False) ,
+    "OPENTABLE": (read.OPENTABLE,True) ,
+    "DELTABLE": (delete.DELTABLE,True) ,
+}
+
+
 # usefull to get String input and numeric input
-
 
 def check_input_type(user_input):
     try:
@@ -32,140 +41,7 @@ def check_input_type(user_input):
         except ValueError:
             return "String"
 
-def ADD () :
-    print("Executing command : ADD")
-    
-    global Current_table
-    
-    if not Current_table:
-        print("Error: No table opened.")
-        return
 
-    
-    columns = list(pd.read_csv(f'{Current_table}.csv').columns)
-    
-    row_data = {}  
-
-    for column in columns :
-        data_input = input(f"value for column {column}")
-        row_data[f"{column}"] = data_input
-        
-    row_df = pd.DataFrame([row_data])
-    row_df.to_csv(f'{Current_table}.csv', mode='a', index=False, header=False)
-
-    return
-def DEL () :
-    print("Executing command : DEL")
-    
-    global Current_table
-    
-    if not Current_table:
-        print("Error: No table opened.")
-        return
-
-    df = pd.read_csv(f"{Current_table}.csv")
-
-    try :
-        index_to_delete = int(input("Index to delete : "))
-    except ValueError:
-        print("Invalid index.")
-        return
-    
-    if index_to_delete < 0 or index_to_delete >= len(df):
-        print("Index out of range.")
-        return
-
-    df = df.drop(index_to_delete).reset_index(drop=True)
-    df.to_csv(f"{Current_table}.csv", index=False)
-
-    return
-def ADDCOl() :
-    print("Executing command : ADDCOL ")
-
-    global Current_table
-    df = pd.read_csv(f"{Current_table}.csv")
-
-    col_name = input("Enter new column name: ").strip()
-    default_val = input("Default value: ")
-
-    df[col_name] = default_val
-    df.to_csv(f"{Current_table}.csv", index=False)
-
-    return
-
-def DELCOl() :
-    print("Executing command : DELCOL")
-
-    global Current_table
-    df = pd.read_csv(f"{Current_table}.csv")
-
-    if not Current_table:
-        print("Error: No table opened.")
-        return
-
-    df = pd.read_csv(f"{Current_table}.csv")
-    print("Available columns:", ", ".join(df.columns))
-    col = input("Enter column name to delete: ").strip()
-
-    if col not in df.columns:
-        print("Column not found.")
-        return
-
-    df = df.drop(columns=[col])
-    df.to_csv(f"{Current_table}.csv", index=False)
-
-    return
-
-def NEWTABLE() :
-    print("Executing command : NEWTABLE")
-    name = input("Enter new table name: ").strip()
-
-    cols = input("Enter column names (comma separated): ").split(",")
-    cols = [c.strip() for c in cols if c.strip()]
-
-    if not cols:
-        print("No columns present , Table not created.")
-        return
-
-    df = pd.DataFrame(columns=cols)
-    df.to_csv(f"{name}.csv", index=False)
-    print(f"Table '{name}.csv' created successfully.")
-
-def OPENTABLE() :
-
-    print("Executing command : OPENTABLE")
-    name = input("Table name: ").strip()
-    
-    if not os.path.exists(f"{name}.csv"):
-       print("Error: Table not found.")
-       return
-    
-    global Current_table
-    Current_table = name
-    return
-
-def DELTABLE() :
-    print("Executing command : DELTABLE")
-    
-    name = input("Table name")
-
-    if input("Type 'YES' to confirm").upper() == "YES" :
-        print("Continuing")
-    else : 
-        print("use DELTABLE command again")
-        return
-    
-    file_to_delete = f"{name}.csv"
-
-    try:
-        os.remove(file_to_delete)
-        print(f"File '{file_to_delete}' deleted successfully.")
-    except FileNotFoundError:
-        print(f"Error: File '{file_to_delete}' not found.")
-    except Exception as e:
-        print(f"An error occurred: {e}")
-
-    return
 
 def STOP() :
     global Running
@@ -197,7 +73,12 @@ def MainLoop() :
                                             |___/ 
         """)
 
-        print(f"Current table : {Current_table}" if Current_table else "please use OPENTABLE to set Current table")
+        global Current_table
+        
+        if Current_table:
+            print(f"Current table : {Current_table}")
+        else:
+            print("Please use OPENTABLE to set Current table")
 
         print("Input Your Command : ") 
 
@@ -206,8 +87,8 @@ def MainLoop() :
         Commands :
             "ADD" 
             "DEL"
-            "ADDCOl"
-            "DELCOl"
+            "ADDCOL"
+            "DELCOL"
 
             "NEWTABLE"
             "OPENTABLE"
@@ -220,8 +101,19 @@ def MainLoop() :
         if command == "STOP":
             STOP()
         elif command in Commands:
-            # calls the function with the same name
-            globals()[command]()  
+    
+            # check if it needs Current_table
+            if Commands[command][1]==True:
+                result=Commands[command][0](Current_table)
+
+            else:
+                result=Commands[command][0]()
+                
+            #Update current_table to whatever value the function returned.
+            if result is not None:
+                Current_table=result
+
+    
         else:
             print("Unknown command.")
             time.sleep(1)
