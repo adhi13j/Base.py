@@ -9,28 +9,16 @@ def ADD(Current_table):
         print("Error: No table opened.")
         return
 
-<<<<<<< HEAD
-    is_primary = input("is the column primary key : ")
-    columns = list(pd.read_csv(f'{Current_table}.csv').columns)
-    
-    row_data = {}  
-=======
     df = pd.read_csv(f'{Current_table}.csv')
     
     df.reset_index(drop=True, inplace=True)
     columns = list(df.columns)
->>>>>>> bcb5ea27842f47c8eec4640d08db15f6bacd157b
 
     
     with open(f"{Current_table}.meta.json", "r") as f:
         data = json.load(f)
         
-<<<<<<< HEAD
-    row_df = pd.DataFrame([row_data])
-    row_df.to_csv(f'{Current_table}.csv', mode='a', index=False, header=False)
-=======
     primary = data["primary_key"]
->>>>>>> bcb5ea27842f47c8eec4640d08db15f6bacd157b
 
     row_data = {}
 
