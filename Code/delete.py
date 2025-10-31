@@ -21,7 +21,7 @@ def DEL (Current_table) :
         return
 
     df = df.drop(index_to_delete).reset_index(drop=True)
-    df.to_csv(f"{Current_table}.csv", index=True)
+    df.to_csv(f"{Current_table}.csv", index=False)
 
     return Current_table
 
@@ -45,7 +45,7 @@ def DELCOL(Current_table) :
         return
 
     df = df.drop(columns=[col])
-    df.to_csv(f"{Current_table}.csv", index=True)
+    df.to_csv(f"{Current_table}.csv", index=False)
 
     return Current_table
 

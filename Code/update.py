@@ -8,7 +8,7 @@ def ADD (Current_table) :
         print("Error: No table opened.")
         return
 
-    
+    is_primary = input("is the column primary key : ")
     columns = list(pd.read_csv(f'{Current_table}.csv').columns)
     
     row_data = {}  
@@ -18,7 +18,7 @@ def ADD (Current_table) :
         row_data[f"{column}"] = data_input
         
     row_df = pd.DataFrame([row_data])
-    row_df.to_csv(f'{Current_table}.csv', mode='a', index=True, header=False)
+    row_df.to_csv(f'{Current_table}.csv', mode='a', index=False, header=False)
 
     return Current_table
 
@@ -32,7 +32,7 @@ def ADDCOL(Current_table) :
     default_val = input("Default value: ")
 
     df[col_name] = default_val
-    df.to_csv(f"{Current_table}.csv", index=True)
+    df.to_csv(f"{Current_table}.csv", index=False)
 
     return Current_table
 
@@ -61,7 +61,7 @@ def UPDATECOL(Current_table):
         default_val = input("Default value: ")
 
         df[col_to_update] = default_val
-        df.to_csv(f"{Current_table}.csv", index=True)
+        df.to_csv(f"{Current_table}.csv", index=False)
 
     else :
         values = []
@@ -70,6 +70,6 @@ def UPDATECOL(Current_table):
             values.append(value)
 
         df[col_to_update] = values
-        df.to_csv(f"{Current_table}.csv", index=True)
+        df.to_csv(f"{Current_table}.csv", index=False)
 
     return Current_table

@@ -22,7 +22,7 @@ Commands = {
 
     "NEWTABLE": (create.NEWTABLE,False) ,
     "OPENTABLE": (read.OPENTABLE,True) ,
-    "DELTABLE": (delete.DELTABLE,True) ,
+    "DELTABLE": (delete.DELTABLE,False) ,
 }
 
 
