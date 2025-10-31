@@ -1,26 +1,51 @@
 import pandas as pd
+import json
 
 
-def ADD (Current_table) :
+def ADD(Current_table):
     print("Executing command : ADD")
     
     if not Current_table:
         print("Error: No table opened.")
         return
 
+    df = pd.read_csv(f'{Current_table}.csv')
     
-    columns = list(pd.read_csv(f'{Current_table}.csv').columns)
-    
-    row_data = {}  
+    df.reset_index(drop=True, inplace=True)
+    columns = list(df.columns)
 
-    for column in columns :
-        data_input = input(f"value for column {column}: ")
-        row_data[f"{column}"] = data_input
+    
+    with open(f"{Current_table}.meta.json", "r") as f:
+        data = json.load(f)
         
-    row_df = pd.DataFrame([row_data])
-    row_df.to_csv(f'{Current_table}.csv', mode='a', index=True, header=False)
+    primary = data["primary_key"]
 
+    row_data = {}
+
+    for column in columns:
+        
+        #Prevents duplicate values in primary key column.
+        if column == primary:
+            while True:
+                value = input(f"Value for {column} (PRIMARY KEY): ")
+                
+                
+                if value in df[primary].astype(str).values:
+                    print(f"Primary key must be unique. '{value}' already exists.")
+                else:
+                    row_data[column] = value
+                    break
+        else:
+            value = input(f"Value for {column}: ")
+            row_data[column] = value
+
+    
+    row_df = pd.DataFrame([row_data])
+    row_df.to_csv(f'{Current_table}.csv', mode='a', index=False, header=False)
+
+    print("Row inserted successfully.\n")
     return Current_table
+
 
 
 def ADDCOL(Current_table) :
